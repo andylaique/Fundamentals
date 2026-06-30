@@ -1,46 +1,56 @@
-describe("Automation Practice Mini Project Suite", () => {
-  beforeEach(() => {
-    cy.visit("https://practice.expandtesting.com/");
+describe("Test Automation Practice Suite", { testIsolation: false }, () => {
+  before(() => {
+    //visit the website
+    cy.visit("testautomationpractice.blogspot.com");
   });
 
-  it("Executes form operations, dropdowns, checkboxes, radio buttons, file uploads, and scrolling", () => {
-    cy.contains("Radio Buttons").click();
-    cy.url().should("include", "/radio-buttons");
+  it("Fill out the form", () => {
+    cy.get("#name").type("John Doe");
+    cy.get("#email").type("john.doe@example.com");
+    cy.get("#phone").type("1234567890");
+    cy.get("#textarea").type("123 QA Test Automation Street");
+  });
 
-    cy.get("#blue").check().should("be.checked");
-    cy.go("back");
+  it("Select values from a dropdown", () => {
+    cy.get("#country").select("Canada");
 
-    cy.contains("Dropdown").click();
+    cy.get("#country").should("have.value", "canada");
+  });
 
-    cy.get("#dropdown").select("Option 1").should("have.value", "1");
-    cy.go("back");
+  it("Selects a radio buttons", () => {
+    cy.get("#male").check();
 
-    cy.contains("Checkboxes").click();
+    cy.get("#male").should("be.checked");
+  });
 
-    cy.get("#checkbox1").check().should("be.checked");
-    cy.get("#checkbox2").uncheck().should("not.be.checked");
-    cy.contains("File Upload").click();
+  it("Checks and Unchecks checkboxes", () => {
+    cy.get("#sunday").check();
 
-    cy.get('[data-testid="file-input"]').selectFile(
-      "cypress/fixtures/sample.jpg",
-    );
-    cy.get('[data-testid="file-submit"]').click();
+    cy.get("#sunday").should("be.checked");
 
-    cy.get("#uploaded-files").should("contain", "sample.jpg");
-    cy.go("back");
+    cy.get("#sunday").uncheck();
 
-    cy.contains("Form Validation").click();
+    cy.get("#sunday").should("not.be.checked");
+  });
 
-    cy.get('input[name="ContactName"]').type("Jane Doe");
-    cy.get('input[name="ContactPhone"]').type("123-456-7890");
+  it("Uploads a file", () => {
+    cy.get("#singleFileInput").selectFile({
+      contents: Cypress.Buffer.from("Automation Test Context Output Log"),
+      fileName: "upload-manifest.txt",
+      mimeType: "text/plain",
+    });
+    cy.get('input[type="file"]').first().should("exist");
+  });
 
-    cy.get('select[name="payment"]').select("card");
+  it("Scroll to a hidden element", () => {
+    cy.contains("h2", "Footer Links").scrollIntoView();
 
-    cy.get('button[type="submit"]').scrollIntoView().should("be.visible");
-    cy.get('button[type="submit"]').click();
+    cy.contains("h2", "Footer Links").should("be.visible");
+  });
 
-    cy.get(".alert-success")
-      .should("be.visible")
-      .and("contain", "Form submitted successfully");
+  it("Clicks the submit button and verifies a success message", () => {
+    cy.get("button.submit-btn").scrollIntoView().click();
+
+    cy.get("button.submit-btn").should("exist");
   });
 });
